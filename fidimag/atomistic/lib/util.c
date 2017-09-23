@@ -435,3 +435,64 @@ void compute_guiding_center(double *spin, int nx, int ny, int nz, int nx_start,
   res[0] = Rx / sum;
   res[1] = Ry / sum;
 }
+
+inline int cell_index(int i, int j, int k, int nx, int ny, int nz) {
+  return k * nx * ny + j * nx + i;
+}
+
+void derivative_x_fourth_order(double *m, double *first_der, double *second_der,
+                               double dx, int nx, int ny, int nz) {
+
+  int i_m2, i_m1, i_p1, i_p2;
+
+  for (int i = 0; i < nx; i++) {
+    for (int j = 0; j < ny; j++) {
+      for (int k = 0; k < nz; k++) {
+
+        i_m2 = i - 2;
+        i_m1 = i - 1;
+        i_p1 = i + 1;
+        i_p2 = i + 2;
+
+        if (i_m2 < 0) {
+          i_m2 = 0;
+        }
+
+        if (i_m1 < 0) {
+          i_m1 = 0;
+        }
+
+        if (i_p1 >= nx - 1) {
+          i_p1 = nx - 1;
+        }
+
+        if (i_p2 >= nx - 1) {
+          i_p2 = nx - 1;
+        }
+
+        int id = 3 * cell_index(i, j, k, nx, ny, nz);
+        int id0 = 3 * cell_index(i_m2, j, k, nx, ny, nz);
+        int id1 = 3 * cell_index(i_m1, j, k, nx, ny, nz);
+        int id2 = 3 * cell_index(i_p1, j, k, nx, ny, nz);
+        int id3 = 3 * cell_index(i_p2, j, k, nx, ny, nz);
+
+        first_der[id] = (m[id0] - m[id3] + 8 * (m[id2] - m[id1])) / (12 * dx);
+        first_der[id + 1] = 1 / (12 * dx) * (m[id0 + 1] - m[id3 + 1] +
+                                             8 * (m[id2 + 1] - m[id1 + 1]));
+        first_der[id + 2] = 1 / (12 * dx) * (m[id0 + 2] - m[id3 + 2] +
+                                             8 * (m[id2 + 2] - m[id1 + 2]));
+
+        second_der[id] = 1 / (12 * dx * dx) * (16 * (m[id1] + m[id2]) -
+                                               30 * m[id] - (m[id0] + m[id3]));
+
+        second_der[id + 1] =
+            1 / (12 * dx * dx) * (16 * (m[id1 + 1] + m[id2 + 1]) -
+                                  30 * m[id + 1] - (m[id0 + 1] + m[id3 + 1]));
+
+        second_der[id + 2] =
+            1 / (12 * dx * dx) * (16 * (m[id1 + 2] + m[id2 + 2]) -
+                                  30 * m[id + 2] - (m[id0 + 2] + m[id3 + 2]));
+      }
+    }
+  }
+}

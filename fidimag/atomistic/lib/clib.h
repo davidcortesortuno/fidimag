@@ -36,8 +36,8 @@ double compute_exch_energy(double *spin, double Jx, double Jy, double Jz,
 
 void compute_anis(double *spin, double *field, double *energy, double *Ku,
                   double *axis, int n);
-void compute_anis_cubic(double *spin, double *field, double *energy,
-	          double *Kc, int n); 
+void compute_anis_cubic(double *spin, double *field, double *energy, double *Kc,
+                        int n);
 
 void dmi_field_bulk(double *spin, double *field, double *energy, double *D,
                     int *ngbs, int n);
@@ -71,6 +71,14 @@ void llg_stt_rhs(double *dm_dt, double *m, double *h, double *h_stt,
 
 void llg_stt_cpp(double *dm_dt, double *m, double *h, double *p, double *alpha,
                  int *pins, double *a_J, double beta, double gamma, int n);
+
+void llg_stt_nonlocal_rhs(double *dm_dt, double *m, double *dm, double *h,
+                          double *h_stt, double *h_lap, double *alpha, double D,
+                          double tau_sd, double tau_sf, double u0, double gamma,
+                          int n);
+
+void derivative_x_fourth_order(double *m, double *first_der, double *second_der,
+                               double dx, int nx, int ny, int nz);
 
 void normalise(double *m, int *pins, int n);
 

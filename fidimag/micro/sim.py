@@ -4,6 +4,7 @@ from . import llg
 from . import llg_stt
 from . import llg_stt_cpp
 from . import baryakhtar
+from . import llg_stt_1d
 
 import fidimag.extensions.micro_clib as micro_clib
 import fidimag.common.helper as helper
@@ -14,6 +15,7 @@ import numpy as np
 
 KNOWN_DRIVERS = {'llg': llg.LLG,
                  'llg_stt': llg_stt.LLG_STT,
+                 'llg_stt_1d': llg_stt_1d.LLG_STT_1D,
                  'llg_stt_cpp': llg_stt_cpp.LLG_STT_CPP,
                  'llbar': baryakhtar.LLBar,
                  'llbar_full': baryakhtar.LLBarFull}

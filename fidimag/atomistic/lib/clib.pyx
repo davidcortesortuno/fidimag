@@ -70,6 +70,12 @@ cdef extern from "clib.h":
                  double *h, double *alpha, int *pins,
                  double gamma, int n, int do_precession, double default_c)
 
+    void llg_stt_nonlocal_rhs(double *dm_dt, double *m, double *dm, double *h,
+                                           double *h_stt, double *h_lap, double *alpha, double D,
+                                           double tau_sd, double tau_sf, double u0, double gamma,
+                                           int n)
+    void derivative_x_fourth_order(double *m, double *first_der, double *second_der,
+                                    double dx, int nx, int ny, int nz)
 
     void llg_rhs_jtimes(double *jtn, double *m, double *h,
                         double *mp, double *hp, double *alpha, int *pins,
@@ -252,7 +258,17 @@ def compute_llg_stt_rhs(np.ndarray[double, ndim=1, mode="c"] dm_dt,
     llg_stt_rhs(&dm_dt[0], &spin[0], &field[0], &field_stt[0],
                 &alpha[0], beta, u0, gamma, n)
 
+def compute_llg_stt_nonlocal_rhs(double [:] dm_dt,
+                double [:] m, double [:] dm, double [:] h, double [:] h_stt,
+                double [:] h_lap, double [:] alpha,  D,
+                tau_sd, tau_sf, u0, gamma, n):
 
+    llg_stt_nonlocal_rhs(&dm_dt[0], &m[0], &dm[0], &h[0],
+                            &h_stt[0], &h_lap[0],  &alpha[0],  D,
+                            tau_sd,  tau_sf,  u0,  gamma, n)
+
+def compute_derivatives_1d(double [:]m, double [:]first_der, double [:] second_der, dx, nx, ny, nz):
+    derivative_x_fourth_order(&m[0], &first_der[0], &second_der[0], dx, nx, ny, nz)
 
 def compute_llg_stt_cpp(np.ndarray[double, ndim=1, mode="c"] dm_dt,
                 np.ndarray[double, ndim=1, mode="c"] spin,
