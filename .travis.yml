@@ -18,10 +18,14 @@ before_install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH=/home/travis/miniconda/bin:$PATH
   - sudo apt-get install liblapack-dev libblas-dev
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update
+  - sudo apt-get install gcc-4.9
+  - sudo apt-get upgrade libstdc++6
+
 install:
   - conda create -q -y -n fidimag-test python=$TRAVIS_PYTHON_VERSION cython matplotlib pytest scipy pytest-cov gcc cmake psutil
   - source activate fidimag-test
-  - conda install libgcc
   - pip install pyvtk six nbval
   - pip install pyvtk six ipywidgets
   - pip install git+https://github.com/computationalmodelling/nbval.git
