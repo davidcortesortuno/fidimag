@@ -18,7 +18,7 @@ before_install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH=/home/travis/miniconda/bin:$PATH
   - sudo apt-get install liblapack-dev libblas-dev
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update
   - sudo apt-get install gcc-4.9
   - sudo apt-get upgrade libstdc++6
