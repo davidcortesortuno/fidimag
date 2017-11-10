@@ -79,6 +79,16 @@
  * value for the prefactor (6). 
  */
 
+void normalize_m(double * m, int n){
+    double mag;
+    for (int i = 0; i < n; i++) {
+        mag = sqrt(m[3*i]*m[3*i] + m[3*i+1]*m[3*i+1] + m[3*i+2]*m[3*i+2]);
+        for(int j = 0; j < 3; j++) {
+            m[3*i+j] /= mag;
+        }
+    }
+}
+
 void llg_rhs(double * dm_dt, double * m, double * h, double * alpha, int * pins,
         double gamma, int n, int do_precession, double default_c) {
 
@@ -146,20 +156,8 @@ void llg_rhs(double * dm_dt, double * m, double * h, double * alpha, int * pins,
         // (2014) if possible, we can combine it with adaptive step size, don't
         // know how to do but it's worth a try.
 
-        if (default_c < 0){
-            c = 6 * sqrt(dm_dt[i] * dm_dt[i] +
-                         dm_dt[j] * dm_dt[j] + 
-                         dm_dt[k] * dm_dt[k]
-                         );
-        } else {
-            c = default_c;
-        }
-        //printf("%0.15g   %0.15g\n", c, default_c);
-
         // Correct the RHS term to keep m normalised
-        dm_dt[i] += c * (1 - mm) * m[i];
-        dm_dt[j] += c * (1 - mm) * m[j];
-        dm_dt[k] += c * (1 - mm) * m[k];
+        
 
     }
 
