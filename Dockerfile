@@ -35,7 +35,7 @@ ENV OMP_NUM_THREADS=2
 # WORKDIR /io
 
 # User to make Binder happy
-ENV NB_USER micromag
+ENV NB_USER magnetism
 ENV NB_UID 1000
 ENV HOME /home/${NB_USER}
 
@@ -50,4 +50,4 @@ USER root
 RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
 
-WORKDIR /home/${USER}
+WORKDIR /home/${USER}/magnetism/doc/ipynb
