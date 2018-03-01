@@ -1,43 +1,53 @@
 FROM ubuntu:16.04
 
-# To build this image `docker build -t fidimag .`
-# Then you can drop into a live bash shell with `docker run -it fidimag`.
-ENTRYPOINT ["/bin/bash"]  
-SHELL ["/bin/bash", "-c"] 
+RUN apt -y update 
+RUN apt install -y git python3 python3-pip gcc psutils cmake wget make
+RUN apt install -y gfortran libblas-dev liblapack-dev python3-tk sudo fonts-lato
+RUN pip3 install cython matplotlib pytest scipy psutil pyvtk ipywidgets
+RUN pip3 install --no-cache-dir notebook
 
-RUN apt-get update -y
-RUN apt-get install -y build-essential cmake cython3 python3-dev python3-pip \
-    python3-psutil python3-pytest python3-pytest-cov \
-    python3-matplotlib python3-numpy python3-scipy \
-    liblapack-dev libopenblas-dev \
-    wget
-# next line for codecov target
-RUN apt-get install -y curl git
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
-# ----------
-# hack to fix sudden breakage in CI
-# (fix from https://github.com/getsentry/sentry/issues/3143)
-# (first occurance of fail at https://travis-ci.org/computationalmodelling/fidimag/builds/319708056?utm_source=github_status&utm_medium=notification)
-# (which is part of this pull request: https://github.com/computationalmodelling/fidimag/pull/106)
-RUN pip3 install --upgrade setuptools==20.4
-# ----------
+WORKDIR /usr/local
+RUN git clone https://github.com/computationalmodelling/fidimag.git
+WORKDIR /usr/local/fidimag
+# Work with stable release
+RUN git checkout tags/v2.9
+# Install CVODE and FFTW libraries
+WORKDIR /usr/local/fidimag/bin
+RUN bash install-fftw.sh
+RUN bash install-sundials.sh
 
-# ----------
-# hack to fix sudden breakage in CI
-# (fix from https://github.com/getsentry/sentry/issues/3143)
-# (first occurance of fail at https://travis-ci.org/computationalmodelling/fidimag/builds/319708056?utm_source=github_status&utm_medium=notification)
-# (which is part of this pull request: https://github.com/computationalmodelling/fidimag/pull/106)
-RUN pip3 install --upgrade setuptools==20.4
-# ----------
+ENV PYTHONPATH="/usr/local/fidimag:$PYTHONPATH"
+ENV LD_LIBRARY_PATH="/usr/local/fidimag/local/lib:$LD_LIBRARY_PATH"
 
-RUN pip3 install ipywidgets nbval pyvtk six
+WORKDIR /usr/local/fidimag
+RUN python3 setup.py build_ext --inplace
+RUN python3 -c "import matplotlib"
+# Headless Matplotlib:
+ENV MPLBACKEND=Agg
 
-WORKDIR /fidimag
-ADD . /fidimag
-RUN ./bin/install-sundials.sh
-RUN ./bin/install-fftw.sh
-RUN make build
+# Headless Matplotlib:
+ENV MPLBACKEND=Agg
 
-ENV PYTHONPATH=/fidimag \
-    LD_LIBRARY_PATH=/fidimag/local/lib LD_RUN_PATH=/fidimag/local/lib \
-    OMP_NUM_THREADS=1 MPLBACKEND=Agg QT_API=pyqt
+# Set threads for OpenMP:
+ENV OMP_NUM_THREADS=2
+# WORKDIR /io
+
+# User to make Binder happy
+ENV NB_USER micromag
+ENV NB_UID 1000
+ENV HOME /home/${NB_USER}
+
+RUN adduser --disabled-password \
+    --gecos "Default user" \
+    --uid ${NB_UID} \
+    ${NB_USER}
+
+# Make sure the contents of our repo are in ${HOME}
+COPY . ${HOME}
+USER root
+RUN chown -R ${NB_UID} ${HOME}
+USER ${NB_USER}
+
+WORKDIR /home/${USER}/doc/ipynb
