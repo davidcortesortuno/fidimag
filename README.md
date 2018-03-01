@@ -1,7 +1,7 @@
 FIDIMAG
 =======
 
-.. image:: https://mybinder.org/badge.svg :target: https://mybinder.org/v2/gh/davidcortesortuno/fidimag/master
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/davidcortesortuno/fidimag/master)
 
 [![Build Status](https://travis-ci.org/computationalmodelling/fidimag.svg?branch=master)](https://travis-ci.org/computationalmodelling/fidimag)
 [![Documentation Status](https://readthedocs.org/projects/fidimag/badge/?version=latest)](http://fidimag.readthedocs.org/en/latest/?badge=latest)
